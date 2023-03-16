@@ -13,17 +13,21 @@
 
   let running = false;
   let activeIndex = -1;
+  let progressWidth = 0;
 
   async function runPipeline() {
     if (running) return;
     running = true;
     for (let i = 0; i < stages.length; i++) {
       activeIndex = i;
+      progressWidth = ((i + 1) / stages.length) * 100;
       await new Promise(resolve => setTimeout(resolve, 5000));
     }
     activeIndex = -1;
+    progressWidth = 0;
     running = false;
   }
+
 </script>
 
 <style>
@@ -96,6 +100,17 @@
     display: inline-block;
   }
 
+  .progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background-color: #3498db;
+    z-index: 0;
+    transition: width 5s linear;
+  }
+
 </style>
 
 <button on:click={runPipeline} disabled={running}>
@@ -108,7 +123,9 @@
 
 
 <div class="pipeline">
-  <div class="connecting-line"></div>
+  <div class="connecting-line">
+    <div class="progress" style="width: {progressWidth}%;"></div>
+  </div>
   {#each stages as stage}
   <div class="stage" class:running={stage === stages[activeIndex]}>
   <div class="title">{stage.title}</div>
